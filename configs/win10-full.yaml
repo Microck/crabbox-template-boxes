@@ -2,7 +2,7 @@ provider: external
 target: windows
 
 external:
-  command: /home/ubuntu/.crabbox/crabbox-win10-qemu-provider.sh
+  command: /home/ubuntu/.crabbox/providers/windows-qemu-provider.sh
   connection:
     resourceName: "{{leaseIdSlug}}"
     ssh:
@@ -19,4 +19,3 @@ workRoot: C:\crabbox-work
 
 sync:
   gitSeed: false
-

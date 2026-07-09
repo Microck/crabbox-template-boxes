@@ -1,10 +1,10 @@
-# Crabbox Yoga Boxes
+# Crabbox Template Boxes
 
-Repeatable Crabbox setup for:
+Template configs and host scripts for Crabbox boxes:
 
 - Linux boxes on Oracle Paris Docker
-- Windows 10 ARM64 boxes on Yoga through QEMU
-- Windows 11 ARM64 boxes on Yoga through Hyper-V
+- Windows 10 ARM64 boxes through QEMU on a Windows ARM64 host
+- Windows 11 ARM64 boxes through Hyper-V on a Windows ARM64 host
 
 This repository intentionally does not include Microsoft ISOs, VHDX images,
 PortableGit archives, VirtIO ISOs, private keys, or passwords. It publishes the
@@ -18,15 +18,15 @@ scripts and configs needed to recreate the setup from licensed/local inputs.
 | `linux-node` | `configs/linux-node.yaml` | Oracle Paris Docker `crabbox:node` | verified |
 | `linux-full` | `configs/linux-full.yaml` | Oracle Paris Docker `crabbox:full` | verified |
 | `linux-browser` | `configs/linux-browser.yaml` | Oracle Paris Docker `crabbox:browser` | verified |
-| `win10-full` | `configs/win10-full.yaml` | Yoga QEMU `win10-arm64-clean-qemu-sealed` | verified |
-| `win11-full` | `configs/win11-full-hyperv.yaml` | Yoga Hyper-V `win11-arm64-hyperv-base` | verified |
+| `win10-full` | `configs/win10-full.yaml` | Windows-host QEMU `win10-arm64-clean-qemu-sealed` | verified |
+| `win11-full` | `configs/win11-full-hyperv.yaml` | Windows-host Hyper-V `win11-arm64-hyperv-base` | verified |
 
 `configs/win11-full-qemu.candidate.yaml` is included only as a record of the
 candidate path. It did not reach SSH during verification and is not supported.
 
 ## Local Layout
 
-Expected Yoga host layout:
+Expected Windows host layout:
 
 ```text
 C:\crabbox
@@ -36,7 +36,7 @@ C:\crabbox
   boxes\
     box-001.vhdx
   win10-qemu-manager.ps1
-  hyperv-yoga-manager.ps1
+  win11-hyperv-manager.ps1
 ```
 
 Expected Linux agent layout:
@@ -44,11 +44,11 @@ Expected Linux agent layout:
 ```text
 ~/.crabbox/
   templates/
-  crabbox-win10-qemu-provider.sh
+  providers/
+    windows-qemu-provider.sh
+    windows-hyperv-provider.sh
+    windows-hyperv-proxy.sh
   qemu-tunnels/
-~/.config/crabbox/
-  hyperv-yoga-provider.sh
-  hyperv-yoga-proxy.sh
 ```
 
 ## Required Secrets
@@ -57,13 +57,9 @@ Do not commit these values. Export them in the shell or store them in a local
 secret file outside this repository.
 
 ```sh
-export CRABBOX_QEMU_YOGA_HOST=100.85.142.35
-export CRABBOX_QEMU_YOGA_USER=microck
-export CRABBOX_QEMU_YOGA_PASS='...'
-
-export CRABBOX_HYPERV_YOGA_HOST=100.85.142.35
-export CRABBOX_HYPERV_YOGA_USER=microck
-export CRABBOX_HYPERV_YOGA_PASS='...'
+export CRABBOX_WINDOWS_HOST=100.85.142.35
+export CRABBOX_WINDOWS_USER=microck
+export CRABBOX_WINDOWS_PASS='...'
 ```
 
 ## Usage
@@ -80,21 +76,22 @@ CRABBOX_CONFIG=/home/ubuntu/.crabbox/templates/win11-full-hyperv.yaml crabbox ru
 
 Windows 10 QEMU requires these base-image steps:
 
-1. Build or place a licensed Windows 10 ARM64 VHDX on Yoga.
+1. Build or place a licensed Windows 10 ARM64 VHDX on the Windows host.
 2. Patch VirtIO networking, OpenSSH key access, default shell, profile, and Git
    using the scripts in `scripts/win10/`.
-3. Boot once with `scripts/yoga/win10-qemu-manager.ps1`.
-4. Shut down the guest and run `scripts/yoga/seal-win10-qemu-postboot.ps1`.
+3. Boot once with `scripts/windows-host/win10-qemu-manager.ps1`.
+4. Shut down the guest and run `scripts/windows-host/seal-win10-qemu-postboot.ps1`.
 5. Use `win10-arm64-clean-qemu-sealed` with 4 vCPU and 3072 MB RAM.
 
 Windows 11 Hyper-V requires:
 
 1. A licensed/prepared W11 ARM64 Hyper-V VHDX.
-2. `scripts/yoga/create-win11-hyperv-base.ps1` to copy it into
+2. `scripts/windows-host/create-win11-hyperv-base.ps1` to copy it into
    `C:\crabbox\images\win11-arm64-hyperv-base.vhdx`.
 3. `scripts/win10/patch-win10-ready-ssh-key.ps1` run against that base image to
    install the agent public key for Administrator SSH.
-4. `scripts/yoga/hyperv-yoga-manager.ps1` to create per-lease differencing VMs.
+4. `scripts/windows-host/win11-hyperv-manager.ps1` to create per-lease
+   differencing VMs.
 
 ## Verification Results
 
@@ -120,4 +117,3 @@ https://github.com/Microck/crabbox/tree/fix/windows-native-external-sync
 
 Those changes include native Windows archive sync over SSH without short
 OpenSSH keepalive probes, external provider SSH trust/proxy support, and tests.
-
