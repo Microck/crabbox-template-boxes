@@ -5,8 +5,8 @@
 # so the session goal remains "make Crabbox boxes" rather than a loose VM.
 set -euo pipefail
 
-WINDOWS_HOST="${CRABBOX_WINDOWS_HOST:-100.85.142.35}"
-WINDOWS_USER="${CRABBOX_WINDOWS_USER:-microck}"
+WINDOWS_HOST="${CRABBOX_WINDOWS_HOST:?CRABBOX_WINDOWS_HOST is required}"
+WINDOWS_USER="${CRABBOX_WINDOWS_USER:-Administrator}"
 WINDOWS_PASS="${CRABBOX_WINDOWS_PASS:?CRABBOX_WINDOWS_PASS is required}"
 MANAGER_PATH="${CRABBOX_QEMU_MANAGER_PATH:-C:\\crabbox\\win10-qemu-manager.ps1}"
 GUEST_SSH_KEY="${CRABBOX_QEMU_GUEST_SSH_KEY:-/home/ubuntu/.ssh/id_rsa}"

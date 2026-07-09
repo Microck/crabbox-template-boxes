@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PARIS_HOST="${CRABBOX_PARIS_HOST:-100.96.124.15}"
-PARIS_SSH_ALIAS="${CRABBOX_PARIS_SSH_ALIAS:-oracle-paris}"
-DEFAULT_IMAGE="${CRABBOX_PARIS_IMAGE:-crabbox:full}"
+ORACLE_HOST="${CRABBOX_ORACLE_HOST:?CRABBOX_ORACLE_HOST is required}"
+ORACLE_SSH_ALIAS="${CRABBOX_ORACLE_SSH_ALIAS:-crabbox-oracle}"
+DEFAULT_IMAGE="${CRABBOX_ORACLE_IMAGE:-crabbox:full}"
 NAME_PREFIX="cbx-"
 
 REQUEST=$(cat)
@@ -17,7 +17,7 @@ get_lease_id() { echo "$REQUEST" | jq -r '.desired.leaseId // .lease.leaseId // 
 get_slug() { echo "$REQUEST" | jq -r '.desired.slug // .lease.slug // ""'; }
 
 find_free_port() {
-  ssh "$PARIS_SSH_ALIAS" bash -s <<'PORTSCRIPT'
+  ssh "$ORACLE_SSH_ALIAS" bash -s <<'PORTSCRIPT'
 for port in $(shuf -i 22000-22999); do
   if ! ss -tlnH | awk '{print $4}' | grep -q ":${port}$"; then
     echo "$port"
@@ -30,8 +30,8 @@ PORTSCRIPT
 
 case "$OP" in
   doctor)
-    ssh -o ConnectTimeout=10 "$PARIS_SSH_ALIAS" 'docker info >/dev/null'
-    echo '{"protocolVersion":1,"message":"Paris Docker ready"}'
+    ssh -o ConnectTimeout=10 "$ORACLE_SSH_ALIAS" 'docker info >/dev/null'
+    echo '{"protocolVersion":1,"message":"Oracle Cloud Docker ready"}'
     ;;
   acquire)
     slug=$(get_slug)
@@ -47,19 +47,19 @@ case "$OP" in
     chmod 600 "$key_path"
     pubkey=$(cat "${key_path}.pub")
     env_file="/tmp/cbx-env-${resource_name}"
-    ssh "$PARIS_SSH_ALIAS" "printf 'CRABBOX_PUBKEY=%s\n' '$pubkey' > '$env_file'"
-    ssh "$PARIS_SSH_ALIAS" docker run -d --name "$resource_name" \
+    ssh "$ORACLE_SSH_ALIAS" "printf 'CRABBOX_PUBKEY=%s\n' '$pubkey' > '$env_file'"
+    ssh "$ORACLE_SSH_ALIAS" docker run -d --name "$resource_name" \
       --label crabbox=true \
       --label "crabbox-lease=${lease_id}" \
       -p "${port}:22" \
       --env-file "$env_file" \
       "$IMAGE" >/dev/null
-    ssh "$PARIS_SSH_ALIAS" "rm -f '$env_file'" 2>/dev/null || true
+    ssh "$ORACLE_SSH_ALIAS" "rm -f '$env_file'" 2>/dev/null || true
     jq -n \
       --arg leaseId "$lease_id" \
       --arg slug "$slug" \
       --arg name "$resource_name" \
-      --arg host "$PARIS_HOST" \
+      --arg host "$ORACLE_HOST" \
       --arg port "$port" \
       --arg key "$key_path" \
       '{
@@ -68,7 +68,7 @@ case "$OP" in
           leaseId: $leaseId,
           slug: $slug,
           name: $name,
-          cloudId: ("docker-paris/" + $name),
+          cloudId: ("docker-oracle/" + $name),
           status: "active",
           ssh: {
             host: $host,
@@ -83,7 +83,7 @@ case "$OP" in
   release)
     slug=$(get_slug)
     lease_id=$(get_lease_id)
-    ssh "$PARIS_SSH_ALIAS" docker rm -f "${NAME_PREFIX}${slug}" >/dev/null 2>&1 || true
+    ssh "$ORACLE_SSH_ALIAS" docker rm -f "${NAME_PREFIX}${slug}" >/dev/null 2>&1 || true
     rm -f "${CRABBOX_KEY_DIR:-/home/ubuntu/.crabbox/keys}/${lease_id}" "${CRABBOX_KEY_DIR:-/home/ubuntu/.crabbox/keys}/${lease_id}.pub"
     echo '{"protocolVersion":1,"message":"released"}'
     ;;

@@ -3,8 +3,8 @@ set -euo pipefail
 
 GUEST_HOST="${1:?guest host required}"
 GUEST_PORT="${2:?guest port required}"
-WINDOWS_HOST="${CRABBOX_WINDOWS_HOST:-100.85.142.35}"
-WINDOWS_USER="${CRABBOX_WINDOWS_USER:-microck}"
+WINDOWS_HOST="${CRABBOX_WINDOWS_HOST:?CRABBOX_WINDOWS_HOST is required}"
+WINDOWS_USER="${CRABBOX_WINDOWS_USER:-Administrator}"
 
 if [ -z "${CRABBOX_WINDOWS_PASS:-}" ]; then
   echo "CRABBOX_WINDOWS_PASS is required" >&2

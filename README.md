@@ -1,8 +1,8 @@
 # Crabbox Template Boxes
 
-Template configs and host scripts for Crabbox boxes:
+Template configs and host scripts for building Crabbox boxes in a portable way.
 
-- Linux boxes on Oracle Paris Docker
+- Linux boxes through Oracle Cloud
 - Windows 10 ARM64 boxes through QEMU on a Windows ARM64 host
 - Windows 11 ARM64 boxes through Hyper-V on a Windows ARM64 host
 
@@ -10,19 +10,27 @@ This repository intentionally does not include Microsoft ISOs, VHDX images,
 PortableGit archives, VirtIO ISOs, private keys, or passwords. It publishes the
 scripts and configs needed to recreate the setup from licensed/local inputs.
 
-## Verified Templates
+This is the fork-based template workspace:
+- [crabbox-template-boxes](https://github.com/microck/crabbox-template-boxes)
+- [crabbox windows provider fixes](https://github.com/Microck/crabbox/tree/fix/windows-native-external-sync)
 
-| Template | Config | Backend | Status |
-| --- | --- | --- | --- |
-| `linux-minimal` | `configs/linux-minimal.yaml` | Oracle Paris Docker `crabbox:minimal` | verified |
-| `linux-node` | `configs/linux-node.yaml` | Oracle Paris Docker `crabbox:node` | verified |
-| `linux-full` | `configs/linux-full.yaml` | Oracle Paris Docker `crabbox:full` | verified |
-| `linux-browser` | `configs/linux-browser.yaml` | Oracle Paris Docker `crabbox:browser` | verified |
-| `win10-full` | `configs/win10-full.yaml` | Windows-host QEMU `win10-arm64-clean-qemu-sealed` | verified |
-| `win11-full` | `configs/win11-full-hyperv.yaml` | Windows-host Hyper-V `win11-arm64-hyperv-base` | verified |
+## Template Guide
 
-`configs/win11-full-qemu.candidate.yaml` is included only as a record of the
-candidate path. It did not reach SSH during verification and is not supported.
+| Template | Platform | Backend | Image/template | Purpose | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `linux-minimal` | Linux | External (Oracle Cloud) | `crabbox:minimal` | Fast base checks, short-lived tasks, small footprint | Verified |
+| `linux-node` | Linux | External (Oracle Cloud) | `crabbox:node` | Node-first workflows, JS/TS tooling | Verified |
+| `linux-full` | Linux | External (Oracle Cloud) | `crabbox:full` | Full Linux toolchain for broad CI/test work | Verified |
+| `linux-browser` | Linux | External (Oracle Cloud) | `crabbox:browser` | Browser tasks and headful smoke runs | Verified |
+| `win10-full` | Windows 10 ARM64 | Windows-host QEMU provider | `win10-arm64-clean-qemu-sealed` | Full Windows workflow that boots inside QEMU | Verified |
+| `win11-full` | Windows 11 ARM64 | Windows-host Hyper-V provider | `win11-arm64-hyperv-base` | Lightweight Windows workspace with Hyper-V lease clones | Verified |
+| `win11-full-qemu.candidate.yaml` | Windows 11 ARM64 | QEMU candidate | `win11-arm64` | Experimental path kept for reference | Not supported (SSH probe failed) |
+
+Common Windows template settings:
+
+- QEMU Windows guest: 4 vCPU, 3072 MB RAM, `virtio-net-pci`
+- Win10 template `workRoot`: `C:\\crabbox-work`
+- Win11 Hyper-V template `workRoot`: `C:\\Users\\Administrator\\work`
 
 ## Local Layout
 
@@ -57,9 +65,9 @@ Do not commit these values. Export them in the shell or store them in a local
 secret file outside this repository.
 
 ```sh
-export CRABBOX_WINDOWS_HOST=100.85.142.35
-export CRABBOX_WINDOWS_USER=microck
-export CRABBOX_WINDOWS_PASS='...'
+export CRABBOX_WINDOWS_HOST=<windows-host-ip-or-dns>
+export CRABBOX_WINDOWS_USER=<windows-user>
+export CRABBOX_WINDOWS_PASS='<windows-password>'
 ```
 
 ## Usage
@@ -67,9 +75,9 @@ export CRABBOX_WINDOWS_PASS='...'
 Run a template by pointing `CRABBOX_CONFIG` at the config file:
 
 ```sh
-CRABBOX_CONFIG=/home/ubuntu/.crabbox/templates/linux-full.yaml crabbox run -- uname -a
-CRABBOX_CONFIG=/home/ubuntu/.crabbox/templates/win10-full.yaml crabbox run -- cmd.exe /c ver
-CRABBOX_CONFIG=/home/ubuntu/.crabbox/templates/win11-full-hyperv.yaml crabbox run -- cmd.exe /c ver
+CRABBOX_CONFIG=/path/to/templates/linux-full.yaml crabbox run -- uname -a
+CRABBOX_CONFIG=/path/to/templates/win10-full.yaml crabbox run -- cmd.exe /c ver
+CRABBOX_CONFIG=/path/to/templates/win11-full-hyperv.yaml crabbox run -- cmd.exe /c ver
 ```
 
 ## Rebuild Notes
@@ -95,7 +103,7 @@ Windows 11 Hyper-V requires:
 
 ## Verification Results
 
-Recent verification from `/home/ubuntu/work/crabbox`:
+Recent verification:
 
 | Path | Result |
 | --- | --- |
@@ -105,15 +113,3 @@ Recent verification from `/home/ubuntu/work/crabbox`:
 | Linux browser | passed, command total about 11s |
 | W10 QEMU sealed full | passed, internal total about 1m17s, wall time about 2m36s |
 | W11 Hyper-V full | passed, internal total about 1m13s, wall time about 3m12s |
-
-## Crabbox Fork
-
-The Crabbox CLI changes that make the native Windows external-provider path
-stable are pushed to:
-
-```text
-https://github.com/Microck/crabbox/tree/fix/windows-native-external-sync
-```
-
-Those changes include native Windows archive sync over SSH without short
-OpenSSH keepalive probes, external provider SSH trust/proxy support, and tests.

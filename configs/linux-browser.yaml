@@ -2,7 +2,7 @@ provider: external
 target: linux
 
 external:
-  command: /home/ubuntu/.crabbox/crabbox-paris-provider.sh
+  command: /home/ubuntu/.crabbox/providers/paris-docker-provider.sh
   connection:
     ssh:
       trustProviderOutput: true
