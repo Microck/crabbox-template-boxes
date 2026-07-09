@@ -1,0 +1,12 @@
+provider: external
+target: linux
+
+external:
+  command: /home/ubuntu/.crabbox/crabbox-paris-provider.sh
+  connection:
+    ssh:
+      trustProviderOutput: true
+  config:
+    image: crabbox:browser
+
+workRoot: /home/ubuntu/work

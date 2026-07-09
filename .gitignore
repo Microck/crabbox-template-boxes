@@ -1,0 +1,11 @@
+*.iso
+*.vhd
+*.vhdx
+*.qcow2
+*.img
+*.key
+id_rsa
+id_ed25519
+qemu-tunnels/
+keys/
+

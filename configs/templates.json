@@ -1,0 +1,41 @@
+{
+  "linux": {
+    "minimal": {
+      "config": "linux-minimal.yaml",
+      "image": "crabbox:minimal",
+      "status": "available"
+    },
+    "node": {
+      "config": "linux-node.yaml",
+      "image": "crabbox:node",
+      "status": "available"
+    },
+    "full": {
+      "config": "linux-full.yaml",
+      "image": "crabbox:full",
+      "status": "available"
+    },
+    "browser": {
+      "config": "linux-browser.yaml",
+      "image": "crabbox:browser",
+      "status": "available"
+    }
+  },
+  "windows": {
+    "win10-full": {
+      "config": "win10-full.yaml",
+      "template": "win10-arm64-clean-qemu-sealed",
+      "status": "verified"
+    },
+    "win11-full": {
+      "config": "win11-full-hyperv.yaml",
+      "template": "win11-arm64-hyperv-base",
+      "status": "verified"
+    },
+    "win11-full-qemu": {
+      "config": "win11-full-qemu.candidate.yaml",
+      "template": "win11-arm64",
+      "status": "candidate-not-ssh-ready"
+    }
+  }
+}

@@ -1,0 +1,22 @@
+provider: external
+target: windows
+
+external:
+  command: /home/ubuntu/.crabbox/crabbox-win10-qemu-provider.sh
+  connection:
+    resourceName: "{{leaseIdSlug}}"
+    ssh:
+      trustProviderOutput: true
+      sshConfigProxy: true
+      readyCheck: cmd.exe /c echo connected
+  config:
+    template: win10-arm64-clean-qemu-sealed
+    netDevice: virtio-net-pci
+    cpuCount: 4
+    memoryMb: 3072
+
+workRoot: C:\crabbox-work
+
+sync:
+  gitSeed: false
+

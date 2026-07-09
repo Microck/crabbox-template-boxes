@@ -1,0 +1,16 @@
+provider: external
+target: windows
+
+external:
+  command: /home/ubuntu/.config/crabbox/hyperv-yoga-provider.sh
+  connection:
+    resourceName: "{{leaseIdSlug}}"
+    ssh:
+      trustProviderOutput: true
+      sshConfigProxy: true
+      readyCheck: echo ready
+
+workRoot: C:\Users\Administrator\work
+
+sync:
+  gitSeed: false
