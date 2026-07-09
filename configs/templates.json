@@ -31,11 +31,6 @@
       "config": "win11-full-hyperv.yaml",
       "template": "win11-arm64-hyperv-base",
       "status": "verified"
-    },
-    "win11-full-qemu": {
-      "config": "win11-full-qemu.candidate.yaml",
-      "template": "win11-arm64",
-      "status": "candidate-not-ssh-ready"
     }
   }
 }

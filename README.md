@@ -24,7 +24,6 @@ This is the fork-based template workspace:
 | `linux-browser` | Linux | External (Oracle Cloud) | `crabbox:browser` | Browser tasks and headful smoke runs | Verified |
 | `win10-full` | Windows 10 ARM64 | Windows-host QEMU provider | `win10-arm64-clean-qemu-sealed` | Full Windows workflow that boots inside QEMU | Verified |
 | `win11-full` | Windows 11 ARM64 | Windows-host Hyper-V provider | `win11-arm64-hyperv-base` | Lightweight Windows workspace with Hyper-V lease clones | Verified |
-| `win11-full-qemu.candidate.yaml` | Windows 11 ARM64 | QEMU candidate | `win11-arm64` | Experimental path kept for reference | Not supported (SSH probe failed) |
 
 Common Windows template settings:
 
